@@ -80,7 +80,6 @@ namespace KpopIdolRoad
             Height = height;
             Weight = weight;
             Agency = (enumAgency)agency;
-            Console.ReadKey();
             InitializeStats(this);
         }
         public static void InitializeStats(Idol idol)
@@ -113,5 +112,23 @@ namespace KpopIdolRoad
             idol = lista[random];
             InitializeStats(idol);
         }
+        public static void PrintIdolData(Idol idol)
+        {
+            Console.WriteLine($"Stage name: {idol.StageName}");
+            Console.WriteLine($"Name: {idol.Name}");
+            Console.WriteLine($"Birth: {idol.Birth}");
+            Console.WriteLine($"Country: {idol.Country}");
+            Console.WriteLine($"Height: {idol.Height}");
+            Console.WriteLine($"Weight: {idol.Weight}");
+            Console.WriteLine($"Position: {idol.Position}");
+            Console.WriteLine($"Agency: {idol.Agency}");
+        }
+        public static void PrintIdolStats(Idol idol)
+        {
+            Console.WriteLine($"Vocal: {idol.Vocal}");
+            Console.WriteLine($"Rap: {idol.Rap}");
+            Console.WriteLine($"Dance: {idol.Dance}");
+        }
+
     }
 }
