@@ -8,19 +8,33 @@ namespace KpopIdolRoad
 {
     public class Menu
     {
-        public static void start()
+        public static void Welcome()
         {
-            bool run = true;
-            int option;
-            string pathSave = "progreso.json";
-
-            Console.WriteLine(@"
+            Console.Write(@"
  _    __  ______   ______   ______    _____  _____    ______   _          ______   ______   ______   _____   
 | |  / / | |  | \ / |  | \ | |  | \    | |  | | \ \  / |  | \ | |        | |  | \ / |  | \ | |  | | | | \ \  
 | |-< <  | |__|_/ | |  | | | |__|_/    | |  | |  | | | |  | | | |   _    | |__| | | |  | | | |__| | | |  | | 
 |_|  \_\ |_|      \_|__|_/ |_|        _|_|_ |_|_/_/  \_|__|_/ |_|__|_|   |_|  \_\ \_|__|_/ |_|  |_| |_|_/_/  
                                                                                                              
 ");
+        }
+        public static void ThanksForPlaying()
+        {
+            Console.Write(@"
+_______ __    _     ______  ______   ______     ______   _        ______  __    _  _____  ______   ______  
+  | |   \ \  | |   | |     / |  | \ | |  | \   | |  | \ | |      | |  | | \ \  | |  | |  | |  \ \ | | ____ 
+  | |    \_\_| |   | |---- | |  | | | |__| |   | |__|_/ | |   _  | |__| |  \_\_| |  | |  | |  | | | |  | | 
+  |_|    ____|_|   |_|     \_|__|_/ |_|  \_\   |_|      |_|__|_| |_|  |_|  ____|_| _|_|_ |_|  |_| |_|__|_| 
+                                                                                                             
+");
+        }
+        public static void Start()
+        {
+            bool run = true;
+            int option;
+            string pathSave = "progreso.json";
+            string pathWin = "ganadoras.json";
+            Welcome();
             do
             {
                 Console.WriteLine("[1]: EMPEZAR JUEGO");
@@ -32,33 +46,35 @@ namespace KpopIdolRoad
                 {
                     case 0:
                         run = false;
+                        Console.Clear();
+                        ThanksForPlaying();
                         break;
                     case 1:
-                        Game.start();
+                        Game.Launch();
                         break;
                     case 2:
                         try
                         {
                             var lista = new List<Idol>();
-                            HelperJson.cargarArchivo(pathSave);
-                            Game.startSave(lista);
+                            lista = HelperJson.CargarArchivo(pathSave);
+                            Game.LaunchSave(lista);
                         }
                         catch (Exception)
                         {
                             Console.WriteLine("No se encontró ninguna partida guardada. Comenzando juego...");
-                            Game.start();
-                            throw;
+                            Game.Launch();
+                            //throw;
                         }
                         break;
                     case 3:
                         try
                         {
-                            HelperJson.cargarArchivo(pathSave);
+                            HelperJson.CargarArchivo(pathWin);
                         }
                         catch (Exception)
                         {
                             Console.WriteLine("No se encontró registros de ganadores.");
-                            throw;
+                            //throw;
                         }
                         break;
                 }
