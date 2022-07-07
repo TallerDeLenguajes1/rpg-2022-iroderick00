@@ -13,7 +13,7 @@ namespace KpopIdolRoad
         {
         }
 
-        public static void generarJson(string pathJson, List<Idol> lista)
+        public static void GenerarJson(string pathJson, List<Idol> lista)
         {
             string archivoGenerado;
             using (var fs = new FileStream(pathJson, FileMode.OpenOrCreate))
@@ -25,7 +25,7 @@ namespace KpopIdolRoad
                 }
             }
         }
-        public static List<Idol> cargarArchivo(string pathJson)
+        public static List<Idol> CargarArchivo(string pathJson)
         {
             var lista = new List<Idol>();
             string archivoCargado;
