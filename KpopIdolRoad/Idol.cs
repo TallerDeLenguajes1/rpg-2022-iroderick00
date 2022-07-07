@@ -69,6 +69,7 @@ namespace KpopIdolRoad
                 }
             }
         }
+        public int Energy { get; set; }
         public Idol() { }
         public Idol(string name, string stageName, DateTime birth, string country, int position, double height, double weight, int agency)
         {
@@ -103,14 +104,15 @@ namespace KpopIdolRoad
                     idol.Dance = new Random().Next(70, 100);
                     break;
             }
+            idol.Energy = 100;
         }
-        public static void GenerateRandom()
+        public static Idol GenerateRandom(Idol idol) // POR QUE ACA TENGO QUE RETURNEAR IDOL Y EN CREATELINEUP NO TENGO QUE RETURNEAR NEWGAME
         {
-            var lista = HelperJson.cargarArchivo(dataJson);
+            var lista = HelperJson.CargarArchivo(dataJson);
             var random = new Random().Next(0, lista.Count);
-            var idol = new Idol();
             idol = lista[random];
             InitializeStats(idol);
+            return idol;
         }
         public static void PrintIdolData(Idol idol)
         {
