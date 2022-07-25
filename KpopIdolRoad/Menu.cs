@@ -30,18 +30,20 @@ _______ __    _     ______  ______   ______     ______   _        ______  __    
         }
         public static void Start()
         {
-            bool run = true;
-            int option;
             string pathSave = "progreso.json";
             string pathWin = "ganadoras.json";
-            Welcome();
+            var partida = new Game();
+            bool run = true;
+            int option;
             do
             {
+                Console.Clear();
+                Welcome();
                 Console.WriteLine("[1]: EMPEZAR JUEGO");
                 Console.WriteLine("[2]: CARGAR SAVE");
                 Console.WriteLine("[3]: VER LISTA DE GANADORAS");
                 Console.WriteLine("[0]:SALIR");
-                option = Convert.ToInt32(Console.ReadLine());
+                option = Convert.ToInt32(Console.ReadLine());//TENGO PROBLEMAS CUANDO SALGO DEL LOOP ANTERIOR. FFLUSH?
                 switch (option)
                 {
                     case 0:
@@ -50,19 +52,22 @@ _______ __    _     ______  ______   ______     ______   _        ______  __    
                         ThanksForPlaying();
                         break;
                     case 1:
-                        Game.Launch();
+                        Game.GiftRandom(partida);
+                        Game.Start(partida);
                         break;
                     case 2:
                         try
                         {
                             var lista = new List<Idol>();
                             lista = HelperJson.CargarArchivo(pathSave);
-                            Game.LaunchSave(lista);
+                            Game.ChooseIdol(partida, lista);
+                            Game.Start(partida);
                         }
                         catch (Exception)
                         {
                             Console.WriteLine("No se encontró ninguna partida guardada. Comenzando juego...");
-                            Game.Launch();
+                            Game.GiftRandom(partida);
+                            Game.Start(partida);
                             //throw;
                         }
                         break;
@@ -74,6 +79,8 @@ _______ __    _     ______  ______   ______     ______   _        ______  __    
                         catch (Exception)
                         {
                             Console.WriteLine("No se encontró registros de ganadores.");
+                            Console.WriteLine("Presione una tecla para volver al menu...");
+                            Console.ReadKey();
                             //throw;
                         }
                         break;

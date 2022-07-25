@@ -25,19 +25,26 @@ namespace KpopIdolRoad
                 }
             }
         }
-        public static List<Idol> CargarArchivo(string pathJson)
+        public static List<Idol>? CargarArchivo(string pathJson) //?//
         {
             var lista = new List<Idol>();
-            string archivoCargado;
-            using (var fs = new FileStream(pathJson, FileMode.Open))
+            try
             {
-                using (var sr = new StreamReader(fs))
+                string archivoCargado;
+                using (var fs = new FileStream(pathJson, FileMode.OpenOrCreate))
                 {
-                    archivoCargado = sr.ReadToEnd();
+                    using (var sr = new StreamReader(fs))
+                    {
+                        archivoCargado = sr.ReadToEnd();
+                    }
                 }
+                lista = JsonSerializer.Deserialize<List<Idol>>(archivoCargado);
+                return lista;
             }
-            lista = JsonSerializer.Deserialize<List<Idol>>(archivoCargado);
-            return lista;
+            catch (System.Text.Json.JsonException)
+            {
+                return lista;
+            }
         }
     }
 }

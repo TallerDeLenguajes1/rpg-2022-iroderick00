@@ -8,28 +8,34 @@ namespace KpopIdolRoad
 {
     public class Game
     {
+        string pathWin = "ganadoras.json";
+        private const int TURNOS = 3;
+        private const int LINEUP = 7;
         public Idol Player { get; set; }
         public List<Idol> LineUp { get; set; }
-        public Game () { }
-        public static void CreateLineUp(Game partida, int cantidad)
+        private bool run;
+        public Game () {  }
+        public static void CreateLineUp(Game partida)
         {
             partida.LineUp = new List<Idol>();
-            for (int i = 0; i < cantidad; i++)
+            partida.Player.Energy = 100;
+            for (int i = 0; i < LINEUP; i++)
             {
                 var aux = new Idol();
-                aux = Idol.GenerateRandom(aux);
+                aux = Idol.GenerateRandom();
                 partida.LineUp.Add(aux);
             }
         }
-        public static void Launch()
+        public static void GiftRandom(Game partida)
         {
-            var newGame = new Game ();
-            CreateLineUp(newGame, 8);
-            Start(newGame);
+            Console.WriteLine("SE VA A ASIGNAR UNA IDOL ALEATORIA PARA COMENZAR");
+            partida.Player = Idol.GenerateRandom();
+            Console.WriteLine("IDOL GENERADA: ");
+            Idol.PrintIdolData(partida.Player);
+            Idol.PrintIdolStats(partida.Player);
         }
-        public static void LaunchSave(List<Idol> list)
+        public static void ChooseIdol(Game partida, List<Idol> list)
         {
-            var newGame = new Game();
             int cont = 0, eleccion;
             Console.WriteLine("LISTA DE IDOLS OBTENIDAS");
             foreach (var idol in list)
@@ -41,12 +47,100 @@ namespace KpopIdolRoad
             }
             Console.WriteLine("Ingrese la posición de la idol que desea utilizar: ");
             eleccion = Convert.ToInt32(Console.ReadLine());
-            newGame.LineUp[0] = list[eleccion];
-            CreateLineUp(newGame, 7);
+            partida.LineUp[0] = list[eleccion];
+        }
+        public static bool Buff(string song, Idol idol)
+        {
+            bool buff = false;
+            return buff;
+        }
+        private static void DecreaseEnergy(Idol idol, double energy)
+        {
+            idol.Energy -= energy;
+        }
+        private static void Benefit(Idol idol)
+        {
+            int choose;
+            Console.WriteLine("Como premio por ganar la ronda hay 2 posibles beneficios: ");
+            Console.WriteLine("[1]: Recuperar energía");
+            Console.WriteLine("[2]: Ganar motivación");
+            choose = Convert.ToInt32(Console.ReadLine());
+            if (choose == 1)
+            {
+                idol.Energy = 100;
+            }
+            else
+            {
+                idol.Motivation += 5;
+            }
+        }
+        public static Idol Round(Game partida)
+        {
+            if (partida.LineUp.Count > 0)
+            {
+                double dmg1, dmg2, turns = 0;
+                while (partida.LineUp[0].Energy >= 0 && partida.Player.Energy >= 0 && turns <= TURNOS/* && list[0].Energy != list[1].Energy*/)
+                {
+                    Console.WriteLine($"turno {turns}");
+                    dmg1 = Math.Max(0, Idol.Skill(partida.Player) - partida.LineUp[0].Motivation);
+                    dmg2 = Math.Max(0, Idol.Skill(partida.LineUp[0]) - partida.Player.Motivation);
+                    Console.WriteLine($"DMG RECIBIDO PLAYER: {dmg2}");
+                    Console.WriteLine($"DMG RECIBIDO CPU: {dmg1}");
+                    //DecreaseEnergy(partida.Player, dmg2);
+                    DecreaseEnergy(partida.LineUp[0], dmg1);
+                    Console.WriteLine($"PLAYER Energía restante: {partida.Player.Energy}");
+                    Console.WriteLine($"CPU Energía restante: {partida.LineUp[0].Energy}");
+                    turns++;
+                }
+                if (partida.Player.Energy < partida.LineUp[0].Energy)
+                {
+                    partida.run = false;
+                    return partida.LineUp[0];
+                }
+                partida.LineUp.Remove(partida.LineUp[0]);
+                return partida.Player;
+            }
+            else
+            {
+                partida.run = false;
+                return partida.Player;
+            }
         }
         public static void Start(Game partida)
         {
-
+            int end = 1;
+            do
+            {
+                Idol control = partida.Player;
+                partida.run = true;
+                CreateLineUp(partida);  
+                int cont = 1;
+                var winners = new List<Idol>();
+                while (partida.run)
+                {
+                    Console.WriteLine($"RONDA NUMERO {cont}");
+                    control = Round(partida);
+                    cont++;
+                    Console.WriteLine($"Ganadora: {control.StageName} de {control.Group}");
+                    if (control == partida.Player)
+                    {
+                        Benefit(partida.Player);
+                    }
+                }
+                if (partida.LineUp.Count == 0)
+                {
+                    Console.WriteLine("WIN");
+                    winners = HelperJson.CargarArchivo(partida.pathWin);
+                    winners.Add(partida.Player);
+                    HelperJson.GenerarJson(partida.pathWin, winners);
+                }
+                else
+                {
+                    Console.WriteLine("LOSE");
+                }
+                Console.WriteLine($"¿Volver a jugar con {partida.Player.StageName} de {partida.Player.Group}? [0]:NO - [1]:SI");
+                end = Convert.ToInt32(Console.ReadLine());
+            } while (end == 1);
         }
     }
 }
