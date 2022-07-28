@@ -49,10 +49,9 @@ namespace KpopIdolRoad
             eleccion = Convert.ToInt32(Console.ReadLine());
             partida.LineUp[0] = list[eleccion];
         }
-        public static bool Buff(string song, Idol idol)
+        public static bool SongBuff(string songArtist, Idol idol)
         {
-            bool buff = false;
-            return buff;
+            return songArtist == idol.Group;
         }
         private static void DecreaseEnergy(Idol idol, double energy)
         {
@@ -60,33 +59,27 @@ namespace KpopIdolRoad
         }
         private static void Benefit(Idol idol)
         {
-            int choose;
+            int choice;
             Console.WriteLine("Como premio por ganar la ronda hay 2 posibles beneficios: ");
-            Console.WriteLine("[1]: Recuperar energía");
-            Console.WriteLine("[2]: Ganar motivación");
-            choose = Convert.ToInt32(Console.ReadLine());
-            if (choose == 1)
-            {
-                idol.Energy = 100;
-            }
-            else
-            {
-                idol.Motivation += 5;
-            }
+            Console.WriteLine("[1]: Mas motivacion");
+            Console.WriteLine("[2]: Mas efectividad");
+            choice = Convert.ToInt32(Console.ReadLine());
+            Idol.BuffStats(idol,choice);
+            idol.Energy += 50;
         }
         public static Idol Round(Game partida)
         {
             if (partida.LineUp.Count > 0)
             {
                 double dmg1, dmg2, turns = 0;
-                while (partida.LineUp[0].Energy >= 0 && partida.Player.Energy >= 0 && turns <= TURNOS/* && list[0].Energy != list[1].Energy*/)
+                while (partida.LineUp[0].Energy >= 0 && partida.Player.Energy >= 0 && turns <= TURNOS)
                 {
                     Console.WriteLine($"turno {turns}");
                     dmg1 = Math.Max(0, Idol.Skill(partida.Player) - partida.LineUp[0].Motivation);
                     dmg2 = Math.Max(0, Idol.Skill(partida.LineUp[0]) - partida.Player.Motivation);
                     Console.WriteLine($"DMG RECIBIDO PLAYER: {dmg2}");
                     Console.WriteLine($"DMG RECIBIDO CPU: {dmg1}");
-                    //DecreaseEnergy(partida.Player, dmg2);
+                    DecreaseEnergy(partida.Player, dmg2);
                     DecreaseEnergy(partida.LineUp[0], dmg1);
                     Console.WriteLine($"PLAYER Energía restante: {partida.Player.Energy}");
                     Console.WriteLine($"CPU Energía restante: {partida.LineUp[0].Energy}");
@@ -111,18 +104,18 @@ namespace KpopIdolRoad
             int end = 1;
             do
             {
-                Idol control = partida.Player;
+                var control = new Idol();
                 partida.run = true;
                 CreateLineUp(partida);  
                 int cont = 1;
                 var winners = new List<Idol>();
-                while (partida.run)
+                while (partida.run/* && partida.LineUp.Count > 0*/)
                 {
                     Console.WriteLine($"RONDA NUMERO {cont}");
                     control = Round(partida);
                     cont++;
                     Console.WriteLine($"Ganadora: {control.StageName} de {control.Group}");
-                    if (control == partida.Player)
+                    if (control == partida.Player && partida.LineUp.Count > 0)
                     {
                         Benefit(partida.Player);
                     }
@@ -131,7 +124,10 @@ namespace KpopIdolRoad
                 {
                     Console.WriteLine("WIN");
                     winners = HelperJson.CargarArchivo(partida.pathWin);
-                    winners.Add(partida.Player);
+                    if (!winners.Contains(partida.Player))
+                    {
+                        winners.Add(partida.Player);
+                    }
                     HelperJson.GenerarJson(partida.pathWin, winners);
                 }
                 else

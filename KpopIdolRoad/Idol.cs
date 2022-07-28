@@ -99,6 +99,25 @@ namespace KpopIdolRoad
             }
         }
         private int cd;
+        private double eff;
+        public double Eff
+        {
+            get { return eff; }
+            set
+            {
+                if ((value >= 0) && (value <= 100))
+                {
+                    eff = value;
+                }
+                else
+                {
+                    if (value > 100)
+                    {
+                        eff = 100;
+                    }
+                }
+            }
+        }
         public int Motivation { get; set; }
         public Idol() { }
         public Idol(string name, string stageName, DateTime birth, string country, int position, double height, double weight, int agency)
@@ -134,8 +153,9 @@ namespace KpopIdolRoad
                     idol.Dance = new Random().Next(70, 100);
                     break;
             }
-            idol.Motivation = new Random().Next(0, 50);
-            idol.energy = 100;
+            idol.Motivation = new Random().Next(10, 30);
+            idol.Energy = 100;
+            idol.Eff = new Random().Next(0, 50);
             idol.cd = 3;
         }
         public static Idol GenerateRandom() // POR QUE ACA TENGO QUE RETURNEAR IDOL Y EN CREATELINEUP NO TENGO QUE RETURNEAR NEWGAME
@@ -164,15 +184,19 @@ namespace KpopIdolRoad
             Console.WriteLine($"Vocal: {idol.Vocal}");
             Console.WriteLine($"Rap: {idol.Rap}");
             Console.WriteLine($"Dance: {idol.Dance}");
+            Console.WriteLine($"Motivation: {idol.Motivation}");
         }
         //Skills
         public static double Skill(Idol idol)
         {
             double dmg = 0;
-            double eff = (double)new Random().Next(0, 100) / 100;
-            if (Game.Buff("a",idol))
+            double eff = idol.Eff / (double)100;
+            var playlist = new Playlist();
+            playlist = SpotifyAPI.get();
+            int random = new Random().Next(0, playlist.items.Count()-1);
+            if (Game.SongBuff(playlist.items[random].track.artists[0].name, idol));
             {
-                eff = Math.Min(100,eff*2);
+                eff = Math.Min(1,eff*2);
             }
             int number = (int)idol.Position;
             if (idol.cd == 0)
@@ -200,6 +224,17 @@ namespace KpopIdolRoad
                 idol.cd--;
             }
             return dmg;
+        }
+        public static void BuffStats(Idol idol, int choice)
+        {
+            if (choice == 1)
+            {
+                idol.Motivation += 5;
+            }
+            else
+            {
+                idol.eff += 10;
+            }
         }
     }
 }
